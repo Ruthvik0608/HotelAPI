@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <Reference Include="SmartHotelBookingSystem">
-      <HintPath>..\..\SmartHotelBookingSystem (4)\SmartHotelBookingSystem\bin\Debug\net8.0\SmartHotelBookingSystem.dll</HintPath>
+      <HintPath>..\..\..\OneDrive - Cognizant\Desktop\SmartHotelBookingSystem\bin\Debug\net8.0\SmartHotelBookingSystem.dll</HintPath>
     </Reference>
   </ItemGroup>
 
