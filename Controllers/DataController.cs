@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SmartHotelBookingSystem.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HotelAPI.Controllers
 {
@@ -18,11 +19,11 @@ namespace HotelAPI.Controllers
 
         // GET: api/LoyaltyAccount
         [HttpGet]
-        public ActionResult<IEnumerable<LoyaltyAccount>> GetLoyaltyAccounts()
+        public async Task<IActionResult> GetLoyaltyAccounts()
         {
             try
             {
-                var accounts = _dataOperations.GetAllLoyaltyAccounts();
+                var accounts = await _dataOperations.GetAllLoyaltyAccountsAsync();
 
                 if (accounts == null || accounts.Count == 0)
                 {
@@ -39,11 +40,11 @@ namespace HotelAPI.Controllers
 
         // GET: api/LoyaltyAccount/{id}
         [HttpGet("{id}")]
-        public ActionResult<LoyaltyAccount> GetLoyaltyAccountById(int id)
+        public async Task<IActionResult> GetLoyaltyAccountById(int id)
         {
             try
             {
-                var account = _dataOperations.GetLoyaltyAccountById(id);
+                var account = await _dataOperations.GetLoyaltyAccountByIdAsync(id);
 
                 if (account == null)
                 {
@@ -60,11 +61,11 @@ namespace HotelAPI.Controllers
 
         // POST: api/LoyaltyAccount
         [HttpPost]
-        public ActionResult CreateLoyaltyAccount([FromBody] LoyaltyAccount newAccount)
+        public async Task<IActionResult> CreateLoyaltyAccount([FromBody] LoyaltyAccount newAccount)
         {
             try
             {
-                _dataOperations.AddLoyaltyAccount(newAccount);
+                await _dataOperations.AddLoyaltyAccountAsync(newAccount);
                 return Ok("Loyalty account created successfully.");
             }
             catch (Exception ex)
@@ -75,11 +76,11 @@ namespace HotelAPI.Controllers
 
         // PUT: api/LoyaltyAccount/{userId}
         [HttpPut("{userId}")]
-        public ActionResult UpdateLoyaltyAccountByUserId(int userId, [FromBody] UpdateLoyaltyAccountRequest request)
+        public async Task<IActionResult> UpdateLoyaltyAccountByUserId(int userId, [FromBody] UpdateLoyaltyAccountRequest request)
         {
             try
             {
-                _dataOperations.UpdateLoyaltyAccountByUserId(userId, request.NewPointsBalance, request.IsActive);
+                await _dataOperations.UpdateLoyaltyAccountByUserIdAsync(userId, request.NewPointsBalance, request.IsActive);
                 return Ok("Loyalty account updated successfully.");
             }
             catch (Exception ex)
@@ -96,11 +97,11 @@ namespace HotelAPI.Controllers
 
         // DELETE: api/LoyaltyAccount/{id}
         [HttpDelete("{id}")]
-        public ActionResult DeleteLoyaltyAccount(int id)
+        public async Task<IActionResult> DeleteLoyaltyAccount(int id)
         {
             try
             {
-                var result = _dataOperations.DeleteLoyaltyAccount(id);
+                var result = await _dataOperations.DeleteLoyaltyAccountAsync(id);
 
                 if (!result)
                 {

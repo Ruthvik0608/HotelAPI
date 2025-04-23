@@ -34,7 +34,6 @@ namespace HotelAPI
             builder.Services.AddScoped<ReviewsRepository>();
             builder.Services.AddScoped<UserRepository>();
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -49,8 +48,9 @@ namespace HotelAPI
 
             app.UseCors("AllowAll");
             app.UseHttpsRedirection();
-
+           
             app.UseAuthentication();
+            app.UseAuthorization();
             app.MapControllers();
             app.Run();
 
