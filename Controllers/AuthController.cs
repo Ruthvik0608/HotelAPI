@@ -21,6 +21,7 @@ namespace HotelAPI.Controllers
             _jwtTokenGenerator = jwtTokenGenerator;
         }
 
+
         [Authorize(Roles = "admin")]
         [HttpPost("admin/register")]
         public async Task<IActionResult> AdminRegister([FromBody] AdminUserRegistrationRequest newUserRequest)
@@ -63,20 +64,28 @@ namespace HotelAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
         {
-            if (request == null)
+            try
             {
-                return BadRequest("Invalid login request.");
-            }
+                if (request == null)
+                {
+                    return BadRequest("Invalid login request.");
+                }
 
-            var user = await _userRepository.ValidateUser(request.Email, request.Password);
-            if (user == null)
-            {
-                return Unauthorized("Invalid credentials.");
+                var user = await _userRepository.ValidateUser(request.Email, request.Password);
+                if (user == null)
+                {
+                    return Unauthorized("Invalid credentials.");
+                }
+                else
+                {
+                    var token = _jwtTokenGenerator.GenerateToken(user);
+                    return Ok(new { Token = token, Role = user.Role });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var token = _jwtTokenGenerator.GenerateToken(user);
-                return Ok(new { Token = token, Role = user.Role });
+                // Log the exception (consider using a logging framework)
+                return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
     }

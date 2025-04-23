@@ -8,7 +8,7 @@ using Microsoft.OpenApi.Models;
 using SmartHotelBookingSystem.BusinessLogicLayer;
 using SmartHotelBookingSystem.DataAccess.ADO;
 using SmartHotelBookingSystem.DataAccess.EFCore;
-using SmartHotelBookingSystem.Models;
+using SmartHotelBookingSystem.Services;
 using System.Text;
 
 namespace HotelAPI
@@ -18,6 +18,9 @@ namespace HotelAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+            builder.Logging.AddDebug(); // Add detailed logging
 
             // Add services to the container.
             builder.Services.AddControllers();
@@ -38,30 +41,34 @@ namespace HotelAPI
             builder.Services.AddScoped<ReviewsRepository>();
             builder.Services.AddScoped<UserRepository>();
 
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            // Register JwtTokenGenerator
+            builder.Services.AddScoped<JwtTokenGenerator>();
 
-
-            var key = builder.Configuration.GetValue<string>("ApiSettings:key");
+            // Configure JWT authentication
+            var key = builder.Configuration["Jwt:Key"];
             builder.Services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-                .AddJwtBearer(x =>
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
                 {
-                    x.RequireHttpsMetadata = false;
-                    x.SaveToken = true;
-                    x.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
-                        ValidateIssuer = false,
-                        ValidateAudience = false
-                    };
-                });
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
+            // Configure Swagger
+            builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Smart Hotel Booking API", Version = "v1" });
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "JWT Authorization header using the Bearer scheme (Example: 'Bearer 12345abcdef')",
@@ -70,7 +77,6 @@ namespace HotelAPI
                     Type = SecuritySchemeType.ApiKey,
                     Scheme = "Bearer"
                 });
-
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
@@ -90,8 +96,6 @@ namespace HotelAPI
                 });
             });
 
-
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -100,12 +104,11 @@ namespace HotelAPI
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Smart Hotel Booking API V1");
                 });
             }
 
             app.UseHttpsRedirection();
-            app.UseCors("AllowLocalhost");
             app.UseAuthentication();
             app.UseAuthorization();
 
