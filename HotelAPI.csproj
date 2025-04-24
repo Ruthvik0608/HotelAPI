@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <Reference Include="SmartHotelBookingSystem">
-      <HintPath>..\..\SmartHotelBookingSystem\bin\Debug\net8.0\SmartHotelBookingSystem.dll</HintPath>
+      <HintPath>..\SmartHotelBookingSystem\bin\Debug\net8.0\SmartHotelBookingSystem.dll</HintPath>
     </Reference>
   </ItemGroup>
 
